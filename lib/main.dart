@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/bloc/theme/theme_bloc.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/pages/home_page.dart';
-import 'presentation/pages/settings_page.dart';
+import 'core/routes/app_routes.dart';
 
 void main() {
   runApp(BlocProvider(create: (context) => ThemeBloc(), child: const MyApp()));
@@ -18,13 +17,10 @@ class MyApp extends StatelessWidget {
       builder: (context, state) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Custom Step Example',
+          title: 'Material UI Showcase',
           theme: AppTheme.getThemeData(state.themeMode),
-          initialRoute: '/',
-          routes: {
-            '/': (context) => const HomePage(),
-            '/settings': (context) => const SettingsPage(),
-          },
+          initialRoute: AppRoutes.splash,
+          routes: AppRoutes.routes,
         );
       },
     );
