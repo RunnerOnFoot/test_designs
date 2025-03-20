@@ -7,9 +7,9 @@ class CustomStep extends StatelessWidget {
   final IconData? icon;
   final String? number;
   final StepStatus status;
-  final Color backgroundColor;
-  final Color borderColor;
-  final Color contentColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final Color? contentColor;
   final double borderRadius;
   final double padding;
   final double size;
@@ -20,9 +20,9 @@ class CustomStep extends StatelessWidget {
     this.icon,
     this.number,
     required this.status,
-    this.backgroundColor = AppColors.surface,
-    this.borderColor = Colors.transparent,
-    this.contentColor = AppColors.onSurface,
+    this.backgroundColor,
+    this.borderColor,
+    this.contentColor,
     this.borderRadius = 6,
     this.padding = 4,
     this.size = 24,
@@ -34,11 +34,18 @@ class CustomStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Determine colors based on status and fallback to provided colors or defaults
+    Color bgColor = backgroundColor ?? _getBackgroundColor(status, colorScheme);
+    Color bColor = borderColor ?? _getBorderColor(status, colorScheme);
+    Color cColor = contentColor ?? _getContentColor(status, colorScheme);
+
     return Material(
-      color: backgroundColor,
+      color: bgColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
-        side: BorderSide(color: borderColor, width: 1),
+        side: BorderSide(color: bColor, width: 1),
       ),
       child: InkWell(
         onTap: onPressed,
@@ -48,14 +55,46 @@ class CustomStep extends StatelessWidget {
           child: SizedBox(
             width: size,
             height: size,
-            child: Center(child: _buildContent()),
+            child: Center(child: _buildContent(cColor)),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Color _getBackgroundColor(StepStatus status, ColorScheme colorScheme) {
+    switch (status) {
+      case StepStatus.complete:
+        return AppColors.success;
+      case StepStatus.inProgress:
+        return colorScheme.primary;
+      case StepStatus.incomplete:
+        return colorScheme.surface;
+    }
+  }
+
+  Color _getBorderColor(StepStatus status, ColorScheme colorScheme) {
+    switch (status) {
+      case StepStatus.complete:
+        return Colors.transparent;
+      case StepStatus.inProgress:
+        return Colors.transparent;
+      case StepStatus.incomplete:
+        return colorScheme.outline;
+    }
+  }
+
+  Color _getContentColor(StepStatus status, ColorScheme colorScheme) {
+    switch (status) {
+      case StepStatus.complete:
+      case StepStatus.inProgress:
+        return colorScheme.surface;
+      case StepStatus.incomplete:
+        return colorScheme.onSurface;
+    }
+  }
+
+  Widget _buildContent(Color contentColor) {
     switch ((icon, number)) {
       case (IconData _, null):
         return Icon(icon, color: contentColor, size: size * 0.6);
